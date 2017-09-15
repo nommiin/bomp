@@ -25,6 +25,15 @@ Engine = {
             document.onkeydown = Engine.Input.Down;
         },
         Loop: function() {
+            // Pre-Update
+            Engine.Instance.Container.forEach(function (instance, index) {
+                instance.Previous.x = instance.x;
+                instance.Previous.y = instance.y;
+                if (instance.PreUpdate !== null) {
+                    instance.PreUpdate();
+                }
+            });
+
             // Update
             Engine.Instance.Container.forEach(function (instance, index) {
                 if (instance.Update !== null) {
@@ -32,9 +41,15 @@ Engine = {
                 }
             });
 
+            // Post-Update
+            Engine.Instance.Container.forEach(function (instance, index) {
+                if (instance.PostUpdate !== null) {
+                    instance.PostUpdate();
+                }
+            });
+
             // Render
             Engine.Core.RenderContext.clearRect(0, 0, Engine.Core.RenderProperties.Width, Engine.Core.RenderProperties.Height);
-            Engine.Core.RenderContext.fillText("Instances: " + Engine.Instance.Container.length, 12, 12);
             Engine.Instance.Container.forEach(function (instance, index) {
                 if (instance.Render !== null) {
                     instance.Render(Engine.Core.RenderContext);
@@ -60,7 +75,9 @@ Engine = {
                 Name: name,
                 Index: 0,
                 Create: null,
+                PreUpdate: null,
                 Update: null,
+                PostUpdate: null,
                 Render: null
             });
             return Engine.Object.Container[Engine.Object.Container.length - 1];
@@ -96,10 +113,16 @@ Engine = {
                     Name: ObjectRef.Name,
                     Index: ObjectRef.Index++,
                     Create: ObjectRef.Create,
+                    PreUpdate: ObjectRef.PreUpdate,
                     Update: ObjectRef.Update,
+                    PostUpdate: ObjectRef.PostUpdate,
                     Render: ObjectRef.Render,
                     x: x || 0,
-                    y: y || 0
+                    y: y || 0,
+                    Previous: {
+                        x: x,
+                        y: y
+                    }
                 });
                 if (ObjectRef.Create != null) {
                     Engine.Instance.Container[Engine.Instance.Container.length - 1].Create();
@@ -114,6 +137,7 @@ Engine = {
                 if (instance.Name == name && instance.Index == index) {
                     Engine.Instance.Container.splice(i, 1);
                     Result = true;
+                    return;
                 }
             });
             return Result;
@@ -123,6 +147,39 @@ Engine = {
             Engine.Instance.Container.forEach(function(instance, i) {
                 if (instance.Name == name) {
                     Result.push(instance);
+                }
+            });
+            return Result;
+        },
+        Count: function(name) {
+            var Result = 0;
+            Engine.Instance.Container.forEach(function(instance, i) {
+                if (instance.Name == name) {
+                    Result++;
+                }
+            });
+            return Result;
+        },
+        Collision: function(x, y, name) {
+            var Result = false;
+            Engine.Instance.Container.forEach(function(instance, i) {
+                if (instance.Name == name) {
+                    if (instance.x == x && instance.y == y) {
+                        Result = true;
+                        return;
+                    }
+                }
+            });
+            return Result;
+        },
+        CollisionList: function(x, y, name) {
+            var Result = [];
+            Engine.Instance.Container.forEach(function(instance, i) {
+                if (instance.Name == name) {
+                    if (instance.x == x && instance.y == y) {
+                        Result.push(instance);
+                        return;
+                    }
                 }
             });
             return Result;
@@ -209,7 +266,7 @@ Engine = {
         lengthdir_y: function(d, l) {
             return (Engine.Math.dcos(d) * l) * -1;
         },
-        random_range: function(min, max) {
+        RandomRange: function(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
     },

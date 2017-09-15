@@ -9,7 +9,6 @@
             <canvas id="main" width="512" height="512" style="border: 1px solid black;"></canvas>
             <!-- Engine -->
             <script type="text/javascript">Engine.Core.Initiate("main", 60);</script>
-            <!-- Sprites -->
 
             <!-- Objects -->
             <script type="text/javascript" src="objects/oPlayer.js"></script>
@@ -19,7 +18,7 @@
             <!-- Game -->
             <script type="text/javascript">
                 Engine.Instance.Create("oPlayer", (Engine.Core.RenderProperties.Width / 16) / 2, (Engine.Core.RenderProperties.Height / 16) / 2);
-                Engine.Instance.Create("oFruit", Engine.Math.random_range(0, (Engine.Core.RenderProperties.Width / 16) - 1), Engine.Math.random_range(0, (Engine.Core.RenderProperties.Height / 16) - 1));
+                Engine.Instance.Create("oFruit", Engine.Math.RandomRange(0, (Engine.Core.RenderProperties.Width / 16) - 1), Engine.Math.RandomRange(0, (Engine.Core.RenderProperties.Height / 16) - 1));
             </script>
         </center>
     </body>
